@@ -10,7 +10,12 @@ from suds.client import Client
 
 load_dotenv()
 
+# Package para Conexión a Oracle
+from syncoracle.connect import connect_to_oracle
+
+# Package para Conexión a Microsoft SQL Server
 from syncmssql.connect import connect_to_mssql
+
 from utils import consolidate_result
 
 # Cargamos las variables de entorno para conexión a Micorosft SQL Server

@@ -9,7 +9,7 @@ try:
                                "instantclient_19_8")
         cx_Oracle.init_oracle_client(lib_dir=lib_dir)
     elif sys.platform.startswith("win32"):
-        lib_dir=r"C:\oracle\instantclient_21_7"
+        lib_dir=r"C:\oracle\instantclient_21_11"
         cx_Oracle.init_oracle_client(lib_dir=lib_dir)
 except Exception as err:
     print(f"Whoops! Error de conexión: {err}")
