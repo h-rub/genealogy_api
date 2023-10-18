@@ -40,3 +40,12 @@ def consolidate_result(original_response):
 
     return result
 
+def jsonify_db_response(cursor):
+    response = cursor.fetchall()
+    if response:
+        row_headers=[x[0] for x in cursor.description]
+
+        json_data = [dict(zip(row_headers,row_values)) for row_values in response]
+    else:
+        json_data = None
+    return json_data

@@ -16,7 +16,7 @@ from syncoracle.connect import connect_to_oracle
 # Package para Conexión a Microsoft SQL Server
 from syncmssql.connect import connect_to_mssql
 
-from utils import consolidate_result
+from utils import consolidate_result, jsonify_db_response
 
 # Cargamos las variables de entorno para conexión a Micorosft SQL Server
 SERVER_MSSQL = os.getenv("SERVER_MSSQL")
@@ -26,6 +26,15 @@ PASSWORD_MSSQL = os.getenv('PASSWORD_MSSQL')
 
 cnxn_mssql, cursor_mssql = connect_to_mssql(server = SERVER_MSSQL, database = DATABASE_MSSQL, username = USER_MSSQL, password = PASSWORD_MSSQL)
 
+
+USER_ORACLE = os.getenv('USER_ORACLE')
+PASSWORD_ORACLE = os.getenv('PASSWORD_ORACLE')
+DSN_ORACLE = os.getenv('DSN_ORACLE')
+
+try:
+    cursor_oracle = connect_to_oracle(USER_ORACLE, PASSWORD_ORACLE, DSN_ORACLE)
+except:
+    print("Error al crear cursor de oracle")
 
 router = APIRouter()
 
@@ -107,3 +116,21 @@ async def test_results(barcode: str):
 
     json_response = consolidate_result(json_data)
     return json_response
+
+@router.get(f"/api/{api_version}/material-metadata")
+async def get_material_metadata(id_material: str):
+    # Query SQL
+    query = """
+            SELECT vcm.*, cm.*, v.*
+            FROM valorescaractmateriais vcm
+            JOIN caractmateriais cm ON vcm.ID_CARACTMATERIAL = cm.ID_CARACTMATERIAL
+            JOIN valpossiveiscaractmateriais v ON vcm.ID_VALORCARACTMAT = v.ID_VALORCARACTMAT
+            WHERE vcm.ID_MATERIAL = :id_material
+        """
+
+    # Ejecuta la consulta con el ID de material proporcionado
+    cursor_oracle.execute(query, id_material=id_material)
+
+    response = jsonify_db_response(cursor_oracle)
+    cursor_oracle.close()
+    return response
